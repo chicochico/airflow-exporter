@@ -2,7 +2,7 @@ from sqlalchemy import func
 from sqlalchemy import text
 
 from flask import Response
-from flask_admin import BaseView, expose
+from flask_appbuilder import BaseView, expose
 
 from airflow.plugins_manager import AirflowPlugin
 from airflow import settings
@@ -81,12 +81,12 @@ def get_dag_labels(dag_id):
 
     if dag is None:
         return [], []
-    
+
     labels = dag.params.get('labels')
 
     if labels is None:
         return [], []
-    
+
     return list(labels.keys()), list(labels.values())
 
 
@@ -100,7 +100,7 @@ class MetricsCollector(object):
         '''collect metrics'''
 
         # Task metrics
-        # Each *MetricFamily generates two lines of comments in /metrics, try to minimize noise 
+        # Each *MetricFamily generates two lines of comments in /metrics, try to minimize noise
         # by creating new group for each dag
         task_info = get_task_state_info()
         for dag_id, tasks in itertools.groupby(task_info, lambda x: x.dag_id):
@@ -113,7 +113,7 @@ class MetricsCollector(object):
             )
             for task in tasks:
                 t_state.add_metric([task.dag_id, task.task_id, task.owners, task.state or 'none'] + v, task.value)
-            
+
             yield t_state
 
         # Dag Metrics
